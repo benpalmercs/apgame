@@ -9,13 +9,20 @@ class Player(pygame.sprite.Sprite):
         super(Player,self).__init__()
         self.x = 500
         self.y = 500
-        self.image = pygame.Surface((25,50), pygame.SRCALPHA, 32)
-        self.image.fill(color)
+        self.images = [pygame.image.load("kidleft.png").convert_alpha(),pygame.image.load("kidright.png").convert_alpha()]
+        self.image = self.images[0]
+        self.image = pygame.transform.scale(self.image, (30,50))
         self.rect = self.image.get_rect(center=(self.x,self.y))
         self.jump_count = 0
-        player.images = []
+        
+        
 
     def move(self,deltax,deltay):
+        if deltax <0:
+            self.image = self.images[1]
+        if deltax > 0: 
+            self.image = self.images[0]
+        self.image = pygame.transform.scale(self.image, (30,50))
         if self.rect.left > 0 and self.rect.right < 1000:
             self.rect.centerx += deltax
         elif self.rect.left <= 0:
