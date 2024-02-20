@@ -13,10 +13,15 @@ class Player(pygame.sprite.Sprite):
         self.image.fill(color)
         self.rect = self.image.get_rect(center=(self.x,self.y))
         self.jump_count = 0
+        player.images = []
 
     def move(self,deltax,deltay):
-        self.rect.centerx += deltax
-        self.rect.centery += deltay
+        if self.rect.left > 0 and self.rect.right < 1000:
+            self.rect.centerx += deltax
+        elif self.rect.left <= 0:
+            self.rect.centerx +=1
+        elif self.rect.right >= 1000:
+            self.rect.centerx -= 1
 
     def gravity(self):
         self.y += 5
@@ -33,7 +38,7 @@ class Player(pygame.sprite.Sprite):
     
     def on_ground(self,group):
         for item in group:
-            if (item.rect.top < (self.rect.bottom + 10)) and (item.rect.top > (self.rect.bottom - 10)) and (item.rect.left < self.rect.right) and (item.rect.right > self.rect.left):
+            if (item.rect.top < (self.rect.bottom + 5)) and (item.rect.top > (self.rect.bottom - 5)) and (item.rect.left < self.rect.right) and (item.rect.right > self.rect.left):
                 return True
 
 
@@ -82,7 +87,7 @@ player1 = Player(FOREST_GREEN)
 player2 = Player(PURPLE)
 players = pygame.sprite.Group()
 players.add(player1)
-players.add(player2)
+# players.add(player2)
 
 walls = pygame.sprite.Group()
 floor = Wall(500,580,3000,50)
@@ -91,13 +96,16 @@ walls.add(floor)
 #making more walls
 wallx = 50
 wally = 500
-for i in range(3):
-    walls.add(Wall(wallx,wally,60,10))
-    wally -= 90
-    wallx += 140
-    walls.add(Wall(wallx,wally,60,10))
-    wally -= 90
-    wallx -= 140
+for i in range(4):
+    for i in range(4):
+        walls.add(Wall(wallx,wally,60,10))
+        wally -= 60
+        wallx += 150
+        walls.add(Wall(wallx,wally,60,10))
+        wally -= 60
+        wallx -= 150
+    wally = 500
+    wallx +=300
 
 
 
@@ -134,14 +142,14 @@ while running:
         player1.move(8,0)
 
     # PLAYER 2 CONTROLS #
-    if keys[pygame.K_w]:
-        player2.jump()
+    # if keys[pygame.K_w]:
+    #     player2.jump()
 
-    if keys[pygame.K_a]:
-        player2.move(-8,0)
+    # if keys[pygame.K_a]:
+    #     player2.move(-8,0)
         
-    if keys[pygame.K_d]:
-        player2.move(8,0)
+    # if keys[pygame.K_d]:
+    #     player2.move(8,0)
 
     for player in players:
         # on_ground = pygame.sprite.spritecollide(player,walls,False) #spritecollide function idea taken from https://stackoverflow.com/questions/43474849/pygame-sprite-collision-with-sprite-group
