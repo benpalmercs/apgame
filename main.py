@@ -9,26 +9,47 @@ class Player(pygame.sprite.Sprite):
         super(Player,self).__init__()
         self.x = 500
         self.y = 500
-        self.images = [pygame.image.load("kidleft.png").convert_alpha(),pygame.image.load("kidright.png").convert_alpha()]
-        self.image = self.images[0]
-        self.image = pygame.transform.scale(self.image, (30,50))
+        self.images_standing = [pygame.image.load("kidleft.png").convert_alpha(),pygame.image.load("kidright.png").convert_alpha()]
+        self.images_walk_right = [pygame.image.load("kidrightwalk1.png").convert_alpha(), pygame.image.load("kidrightwalk2.png").convert_alpha()]
+        self.images_walk_left = [pygame.image.load("kidleftwalk1.png").convert_alpha(), pygame.image.load("kidleftwalk2.png").convert_alpha()]
+        self.image = self.images_standing[0]
+        self.image = pygame.transform.scale(self.image, (50,50))
         self.rect = self.image.get_rect(center=(self.x,self.y))
         self.jump_count = 0
+        self.index = 0
         
         
 
     def move(self,deltax,deltay):
         if deltax <0:
-            self.image = self.images[1]
-        if deltax > 0: 
             self.image = self.images[0]
-        self.image = pygame.transform.scale(self.image, (30,50))
+        if deltax > 0: 
+            self.image = self.images[1]
+        self.image = pygame.transform.scale(self.image, (50,50))
         if self.rect.left > 0 and self.rect.right < 1000:
             self.rect.centerx += deltax
         elif self.rect.left <= 0:
             self.rect.centerx +=1
         elif self.rect.right >= 1000:
             self.rect.centerx -= 1
+
+    def move_right(self):
+        self.image = self.images_walk_right[self.index % 2]
+        self.image = pygame.transform.scale(self.image, (50,50))
+        if self.rect.right <1000:
+            self.rect.centerx += 8
+        elif self.rect.right >1000:
+            self.rect.centerx -= 1
+        self.index+=1
+
+    def move_left(self):
+        self.image = self.images_walk_left[self.index % 2]
+        self.image = pygame.transform.scale(self.image, (50,50))
+        if self.rect.left > 0:
+            self.rect.centerx -= 8
+        elif self.rect.left < 0:
+            self.rect.centerx += 1
+        self.index+=1
 
     def gravity(self):
         self.y += 5
@@ -143,10 +164,10 @@ while running:
         player1.jump()
 
     if keys[pygame.K_LEFT]:
-        player1.move(-8,0)
+        player1.move_left()
         
     if keys[pygame.K_RIGHT]:
-        player1.move(8,0)
+        player1.move_right()
 
     # PLAYER 2 CONTROLS #
     # if keys[pygame.K_w]:
