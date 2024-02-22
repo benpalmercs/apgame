@@ -18,19 +18,20 @@ class Player(pygame.sprite.Sprite):
         self.jump_count = 0
         self.index = 0
         self.heading = "left"
+        self.time = 0
         
-    def move(self,deltax,deltay):
-        if deltax <0:
-            self.image = self.images[0]
-        if deltax > 0: 
-            self.image = self.images[1]
-        self.image = pygame.transform.scale(self.image, (50,50))
-        if self.rect.left > 0 and self.rect.right < 1000:
-            self.rect.centerx += deltax
-        elif self.rect.left <= 0:
-            self.rect.centerx +=1
-        elif self.rect.right >= 1000:
-            self.rect.centerx -= 1
+    # def move(self,deltax,deltay):
+    #     if deltax <0:
+    #         self.image = self.images[0]
+    #     if deltax > 0: 
+    #         self.image = self.images[1]
+    #     self.image = pygame.transform.scale(self.image, (50,50))
+    #     if self.rect.left > 0 and self.rect.right < 1000:
+    #         self.rect.centerx += deltax
+    #     elif self.rect.left <= 0:
+    #         self.rect.centerx +=1
+    #     elif self.rect.right >= 1000:
+    #         self.rect.centerx -= 1
 
     def move_right(self):
         self.image = self.images_walk_right[self.index % 2]
@@ -73,6 +74,9 @@ class Player(pygame.sprite.Sprite):
             
     def hit_wall(self,move):
         self.rect.centerx += move
+
+    def respawn(self):
+        self.rect = self.image.get_rect(center=(self.x,self.y))
         
         
 
@@ -95,6 +99,16 @@ class Spike(pygame.sprite.Sprite):
         self.y = y
         self.image = pygame.image.load("spike.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (width,length))
+        self.rect = self.image.get_rect(center=(self.x,self.y))
+
+
+class Star(pygame.sprite.Sprite):
+    def __init__(self,x,y):
+        super(Star,self).__init__()
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load("gamestar.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (50,50))
         self.rect = self.image.get_rect(center=(self.x,self.y))
 
 
@@ -155,19 +169,28 @@ walls.add(Wall(625,400,550,10)) #2nd Floor
 walls.add(Wall(395,315,60,10)) #Step to 3rd floor
 walls.add(Wall(725,225,550,10)) #3rd Floor
 walls.add(Wall(970,125,60,10))
-# walls.add(Wall(800,50,60,10))
+
+spikes = pygame.sprite.Group()
 for i in range(825,425,-150):
-    walls.add(Spike(i,375,30,50))
+    spikes.add(Spike(i,375,30,50))
 
 for i in range(525,950,100):
-    walls.add(Spike(i,210,30,25))
+    spikes.add(Spike(i,210,30,25))
+
+walls.add(spikes)
+
+stars = pygame.sprite.Group()
+stars.add(Star(650,25))
     
 
 
 # FONT SURFACES #
+font = pygame.font.SysFont(None, 32)
 
+won = font.render("YOU WON", True, GREEN)
+time = font.render(str(player1.time), True, BLACK)
 
-
+win = False
 
 
 # Main game loop
@@ -183,6 +206,7 @@ while running:
 
     players.draw(screen)
     walls.draw(screen)
+    stars.draw(screen)
 
     keys = pygame.key.get_pressed()
 
@@ -215,10 +239,27 @@ while running:
                 player.hit_wall(-8)
             elif player.heading == "jump":
                 player.rect.centery+=10
+
         if not player.on_ground(walls):
             player.gravity()
+
         if player.on_ground(walls):
             player.jump_count = 0
+        
+        if player.on_ground(spikes):
+            player.respawn()
+    
+    if pygame.sprite.spritecollide(player,stars,False):
+        win = True
+
+    if win == True:
+        screen.fill(WHITE)
+        
+
+    # Updating players time played
+    for player in players:
+        if player.index % 60 == 0:
+            player.time += 1
     # Update the display
     pygame.display.flip()
 
