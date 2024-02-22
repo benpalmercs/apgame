@@ -7,7 +7,7 @@ import math
 class Player(pygame.sprite.Sprite):
     def __init__(self,color):
         super(Player,self).__init__()
-        self.x = 500
+        self.x = 0
         self.y = 500
         self.images_standing = [pygame.image.load("kidleft.png").convert_alpha(),pygame.image.load("kidright.png").convert_alpha()]
         self.images_walk_right = [pygame.image.load("kidrightwalk1.png").convert_alpha(), pygame.image.load("kidrightwalk2.png").convert_alpha()]
@@ -17,9 +17,8 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=(self.x,self.y))
         self.jump_count = 0
         self.index = 0
+        self.heading = "left"
         
-        
-
     def move(self,deltax,deltay):
         if deltax <0:
             self.image = self.images[0]
@@ -41,6 +40,7 @@ class Player(pygame.sprite.Sprite):
         elif self.rect.right >1000:
             self.rect.centerx -= 1
         self.index+=1
+        self.heading = "right"
 
     def move_left(self):
         self.image = self.images_walk_left[self.index % 2]
@@ -50,6 +50,7 @@ class Player(pygame.sprite.Sprite):
         elif self.rect.left < 0:
             self.rect.centerx += 1
         self.index+=1
+        self.heading = "left"
 
     def gravity(self):
         self.y += 5
@@ -59,15 +60,21 @@ class Player(pygame.sprite.Sprite):
             print("Death")
     
     def jump(self):
-        if self.jump_count < 20:
+        if self.jump_count < 20 and (not pygame.sprite.spritecollide(self,walls,False)):
             self.y -= 10
             self.rect.centery = self.y
         self.jump_count += 1
+        self.heading = "jump"
     
     def on_ground(self,group):
         for item in group:
             if (item.rect.top < (self.rect.bottom + 5)) and (item.rect.top > (self.rect.bottom - 5)) and (item.rect.left < self.rect.right) and (item.rect.right > self.rect.left):
                 return True
+            
+    def hit_wall(self,move):
+        self.rect.centerx += move
+        
+        
 
 
 class Wall(pygame.sprite.Sprite):
@@ -79,6 +86,13 @@ class Wall(pygame.sprite.Sprite):
         self.image.fill(BLACK)
         self.rect = self.image.get_rect(center=(self.x,self.y))
 
+
+
+class Spike(pygame.sprite.Sprite):
+    def __init__(self,x,y,width,length):
+        self.x = x
+        self.y = y
+        self.image = pygame
 
 
 
@@ -124,17 +138,19 @@ walls.add(floor)
 #making more walls
 wallx = 50
 wally = 500
-for i in range(4):
-    for i in range(4):
-        walls.add(Wall(wallx,wally,60,10))
-        wally -= 60
-        wallx += 150
-        walls.add(Wall(wallx,wally,60,10))
-        wally -= 60
-        wallx -= 150
-    wally = 500
-    wallx +=300
 
+for i in range(3):
+    walls.add(Wall(wallx,wally,60,10))
+    wally -= 100
+    wallx += 150
+    walls.add(Wall(wallx,wally,60,10))
+    wally -= 60
+    wallx -= 150
+walls.add(Wall(250,400,10,700))
+walls.add(Wall(350,200,10,500))
+walls.add(Wall(625,400,550,10))
+walls.add(Wall(970,500,60,10))
+    
 
 
 # FONT SURFACES #
@@ -181,7 +197,13 @@ while running:
 
     for player in players:
         # on_ground = pygame.sprite.spritecollide(player,walls,False) #spritecollide function idea taken from https://stackoverflow.com/questions/43474849/pygame-sprite-collision-with-sprite-group
-         
+        if pygame.sprite.spritecollide(player,walls,False):
+            if player.heading == "left":
+                player.hit_wall(8)
+            elif player.heading == "right":
+                player.hit_wall(-8)
+            elif player.heading == "jump":
+                player.rect.centery+=10
         if not player.on_ground(walls):
             player.gravity()
         if player.on_ground(walls):
