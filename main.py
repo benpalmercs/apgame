@@ -107,7 +107,7 @@ class Star(pygame.sprite.Sprite):
         super(Star,self).__init__()
         self.x = x
         self.y = y
-        self.image = pygame.image.load("gamestar.png").convert_alpha()
+        self.image = pygame.image.load("gamestar1.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (50,50))
         self.rect = self.image.get_rect(center=(self.x,self.y))
 
