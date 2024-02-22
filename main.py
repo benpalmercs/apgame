@@ -168,14 +168,15 @@ walls.add(Wall(970,500,60,10)) #Step to 2nd floor
 walls.add(Wall(625,400,550,10)) #2nd Floor
 walls.add(Wall(395,315,60,10)) #Step to 3rd floor
 walls.add(Wall(725,225,550,10)) #3rd Floor
-walls.add(Wall(970,125,60,10))
+walls.add(Wall(970,125,60,10)) #Step to Star
 
 spikes = pygame.sprite.Group()
+# 2nd Floor Spikes
 for i in range(825,425,-150):
     spikes.add(Spike(i,375,30,50))
-
+# 3rd Floor Spikes
 for i in range(525,950,100):
-    spikes.add(Spike(i,210,30,25))
+    spikes.add(Spike(i,210,20,25))
 
 walls.add(spikes)
 
