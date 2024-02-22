@@ -90,10 +90,12 @@ class Wall(pygame.sprite.Sprite):
 
 class Spike(pygame.sprite.Sprite):
     def __init__(self,x,y,width,length):
+        super(Spike,self).__init__()
         self.x = x
         self.y = y
-        self.image = pygame
-
+        self.image = pygame.image.load("spike.png").convert_alpha()
+        self.image = pygame.transform.scale(self.image, (width,length))
+        self.rect = self.image.get_rect(center=(self.x,self.y))
 
 
 
@@ -146,10 +148,19 @@ for i in range(3):
     walls.add(Wall(wallx,wally,60,10))
     wally -= 60
     wallx -= 150
-walls.add(Wall(250,400,10,700))
-walls.add(Wall(350,200,10,500))
-walls.add(Wall(625,400,550,10))
-walls.add(Wall(970,500,60,10))
+walls.add(Wall(250,400,10,700)) #Long Divider from first chute
+walls.add(Wall(350,200,10,500)) #Long Divider from rest of course
+walls.add(Wall(970,500,60,10)) #Step to 2nd floor
+walls.add(Wall(625,400,550,10)) #2nd Floor
+walls.add(Wall(395,315,60,10)) #Step to 3rd floor
+walls.add(Wall(725,225,550,10)) #3rd Floor
+walls.add(Wall(970,125,60,10))
+# walls.add(Wall(800,50,60,10))
+for i in range(825,425,-150):
+    walls.add(Spike(i,375,30,50))
+
+for i in range(525,950,100):
+    walls.add(Spike(i,210,30,25))
     
 
 
