@@ -7,7 +7,7 @@ import math
 class Player(pygame.sprite.Sprite):
     def __init__(self,color):
         super(Player,self).__init__()
-        self.x = 0
+        self.x = 50
         self.y = 500
         self.images_standing = [pygame.image.load("kidleft.png").convert_alpha(),pygame.image.load("kidright.png").convert_alpha()]
         self.images_walk_right = [pygame.image.load("kidrightwalk1.png").convert_alpha(), pygame.image.load("kidrightwalk2.png").convert_alpha()]
@@ -18,6 +18,7 @@ class Player(pygame.sprite.Sprite):
         self.jump_count = 0
         self.index = 0
         self.heading = "left"
+        self.jumping = False
         self.time = 0
         
     # def move(self,deltax,deltay):
@@ -34,7 +35,10 @@ class Player(pygame.sprite.Sprite):
     #         self.rect.centerx -= 1
 
     def move_right(self):
-        self.image = self.images_walk_right[self.index % 2]
+        if self.index % 12 == 0:
+            self.image = self.images_walk_right[0]
+        elif self.index % 12 == 6:
+            self.image = self.images_walk_right[1]
         self.image = pygame.transform.scale(self.image, (50,50))
         if self.rect.right <1000:
             self.rect.centerx += 8
@@ -44,7 +48,10 @@ class Player(pygame.sprite.Sprite):
         self.heading = "right"
 
     def move_left(self):
-        self.image = self.images_walk_left[self.index % 2]
+        if self.index % 12 == 0:
+            self.image = self.images_walk_left[0]
+        elif self.index % 12 == 6:
+            self.image = self.images_walk_left[1]
         self.image = pygame.transform.scale(self.image, (50,50))
         if self.rect.left > 0:
             self.rect.centerx -= 8
@@ -66,6 +73,9 @@ class Player(pygame.sprite.Sprite):
             self.rect.centery = self.y
         self.jump_count += 1
         self.heading = "jump"
+        self.jumping = True
+        if self.jump_count > 20:
+            self.jumping = False
     
     def on_ground(self,group):
         for item in group:
@@ -163,7 +173,7 @@ for i in range(3):
     wally -= 60
     wallx -= 150
 walls.add(Wall(250,400,10,700)) #Long Divider from first chute
-walls.add(Wall(350,200,10,500)) #Long Divider from rest of course
+walls.add(Wall(350,200,10,550)) #Long Divider from rest of course
 walls.add(Wall(970,500,60,10)) #Step to 2nd floor
 walls.add(Wall(625,400,550,10)) #2nd Floor
 walls.add(Wall(395,315,60,10)) #Step to 3rd floor
@@ -185,15 +195,16 @@ stars.add(Star(650,25))
     
 
 
+win = False
+index = 0
+timer = 0
+
 # FONT SURFACES #
-font = pygame.font.SysFont(None, 32)
+font = pygame.font.SysFont(None, 70)
 
 won = font.render("YOU WON", True, GREEN)
-time = font.render(str(player1.time), True, BLACK)
-
-win = False
-
-
+time_score = font.render(str(timer), True, BLACK)
+time_word = font.render("TIME:",True,BLACK)
 # Main game loop
 running = True
 while running:
@@ -212,7 +223,7 @@ while running:
     keys = pygame.key.get_pressed()
 
     # PLAYER 1 CONTROLS #
-    if keys[pygame.K_UP]:
+    if keys[pygame.K_UP]: # or player1.jumping == True
         player1.jump()
 
     if keys[pygame.K_LEFT]:
@@ -246,21 +257,29 @@ while running:
 
         if player.on_ground(walls):
             player.jump_count = 0
+            player.jumping = False
         
-        if player.on_ground(spikes):
+        if player.on_ground(spikes) and player.jumping == False:
             player.respawn()
     
     if pygame.sprite.spritecollide(player,stars,False):
         win = True
 
-    if win == True:
+    if win:
         screen.fill(WHITE)
+        screen.blit(won,(400,200))
+        screen.blit(time_word,(425,300))
+        screen.blit(time_score,(570,300))
         
 
     # Updating players time played
-    for player in players:
-        if player.index % 60 == 0:
-            player.time += 1
+    elif win != True:
+ 
+        if index % 60 == 0:
+            timer += 1
+            time_score = font.render(str(timer), True, BLACK)
+        screen.blit(time_score,(0,0))
+    index += 1
     # Update the display
     pygame.display.flip()
 
@@ -270,3 +289,4 @@ while running:
 # Quit Pygame properly
 pygame.quit()
 sys.exit()
+
