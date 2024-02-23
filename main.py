@@ -7,8 +7,8 @@ import math
 class Player(pygame.sprite.Sprite):
     def __init__(self,color):
         super(Player,self).__init__()
-        self.x = 50
-        self.y = 500
+        self.x = 115
+        self.y = 520
         self.images_standing = [pygame.image.load("kidleft.png").convert_alpha(),pygame.image.load("kidright.png").convert_alpha()]
         self.images_walk_right = [pygame.image.load("kidrightwalk1.png").convert_alpha(), pygame.image.load("kidrightwalk2.png").convert_alpha()]
         self.images_walk_left = [pygame.image.load("kidleftwalk1.png").convert_alpha(), pygame.image.load("kidleftwalk2.png").convert_alpha()]
@@ -20,19 +20,6 @@ class Player(pygame.sprite.Sprite):
         self.heading = "left"
         self.jumping = False
         self.time = 0
-        
-    # def move(self,deltax,deltay):
-    #     if deltax <0:
-    #         self.image = self.images[0]
-    #     if deltax > 0: 
-    #         self.image = self.images[1]
-    #     self.image = pygame.transform.scale(self.image, (50,50))
-    #     if self.rect.left > 0 and self.rect.right < 1000:
-    #         self.rect.centerx += deltax
-    #     elif self.rect.left <= 0:
-    #         self.rect.centerx +=1
-    #     elif self.rect.right >= 1000:
-    #         self.rect.centerx -= 1
 
     def move_right(self):
         if self.index % 12 == 0:
@@ -86,7 +73,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.centerx += move
 
     def respawn(self):
-        self.rect = self.image.get_rect(center=(self.x,self.y))
+        self.rect.centerx = 50
+        self.rect.centery = 520
         
         
 
@@ -163,14 +151,14 @@ walls.add(floor)
 
 #making more walls
 wallx = 50
-wally = 500
+wally = 480
 
 for i in range(3):
     walls.add(Wall(wallx,wally,60,10))
-    wally -= 100
+    wally -= 80
     wallx += 150
     walls.add(Wall(wallx,wally,60,10))
-    wally -= 60
+    wally -= 80
     wallx -= 150
 walls.add(Wall(250,400,10,700)) #Long Divider from first chute
 walls.add(Wall(350,200,10,550)) #Long Divider from rest of course
@@ -251,6 +239,7 @@ while running:
                 player.hit_wall(-8)
             elif player.heading == "jump":
                 player.rect.centery+=10
+                player.jump_count = 20
 
         if not player.on_ground(walls):
             player.gravity()
