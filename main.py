@@ -9,9 +9,12 @@ class Player(pygame.sprite.Sprite):
         super(Player,self).__init__()
         self.x = 115
         self.y = 520
-        self.images_standing = [pygame.image.load("kidleft.png").convert_alpha(),pygame.image.load("kidright.png").convert_alpha()]
-        self.images_walk_right = [pygame.image.load("kidrightwalk1.png").convert_alpha(), pygame.image.load("kidrightwalk2.png").convert_alpha()]
-        self.images_walk_left = [pygame.image.load("kidleftwalk1.png").convert_alpha(), pygame.image.load("kidleftwalk2.png").convert_alpha()]
+        self.images_standing = [pygame.image.load("kidleft.png").convert_alpha(),
+                                pygame.image.load("kidright.png").convert_alpha()]
+        self.images_walk_right = [pygame.image.load("kidrightwalk1.png").convert_alpha(),
+                                  pygame.image.load("kidrightwalk2.png").convert_alpha()]
+        self.images_walk_left = [pygame.image.load("kidleftwalk1.png").convert_alpha(), 
+                                 pygame.image.load("kidleftwalk2.png").convert_alpha()]
         self.image = self.images_standing[0]
         self.image = pygame.transform.scale(self.image, (50,50))
         self.rect = self.image.get_rect(center=(self.x,self.y))
@@ -231,7 +234,6 @@ while running:
     #     player2.move(8,0)
 
     for player in players:
-        # on_ground = pygame.sprite.spritecollide(player,walls,False) #spritecollide function idea taken from https://stackoverflow.com/questions/43474849/pygame-sprite-collision-with-sprite-group
         if pygame.sprite.spritecollide(player,walls,False):
             if player.heading == "left":
                 player.hit_wall(8)
